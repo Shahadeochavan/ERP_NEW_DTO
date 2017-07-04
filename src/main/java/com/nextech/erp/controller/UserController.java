@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.nextech.erp.constants.ERPConstants;
 import com.nextech.erp.dto.Mail;
+import com.nextech.erp.factory.UserDTO;
 import com.nextech.erp.filter.TokenFactory;
 import com.nextech.erp.model.Authorization;
 import com.nextech.erp.model.Notification;
@@ -84,7 +85,7 @@ public class UserController {
 	MailService mailService;
 
 	@RequestMapping(value = "/create", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, headers = "Accept=application/json")
-	public @ResponseBody UserStatus addUser(@Valid @RequestBody User user,
+	public @ResponseBody UserStatus addUser(@Valid @RequestBody UserDTO userDTO,
 			BindingResult bindingResult,HttpServletRequest request,HttpServletResponse response) {
 		try {
 			if (bindingResult.hasErrors()) {
@@ -92,22 +93,23 @@ public class UserController {
 						.getDefaultMessage());
 			}
 			if ((Boolean) request.getAttribute("auth_token")) {
-				if (userservice.getUserByUserId(user.getUserid()) == null) {
+				if (userservice.getUserByUserId(userDTO.getUserId()) == null) {
 
 				} else {
 					return new UserStatus(2, messageSource.getMessage(
 							ERPConstants.USER_ID, null, null));
 				}
-				if (userservice.getUserByEmail(user.getEmail()) == null) {
+				if (userservice.getUserByEmail(userDTO.getEmail()) == null) {
 				} else {
 					return new UserStatus(2, messageSource.getMessage(
 							ERPConstants.EMAIL_ALREADY_EXIT, null, null));
 				}
-				if (userservice.getUserByMobile(user.getMobile()) == null) {
+				if (userservice.getUserByMobile(userDTO.getMobile()) == null) {
 				} else {
 					return new UserStatus(2, messageSource.getMessage(
 							ERPConstants.CONTACT_NUMBER_EXIT, null, null));
 				}
+				User user = new User();
 				user.setIsactive(true);
 				user.setCreatedBy(Long.parseLong(request.getAttribute("current_user").toString()));
 				userservice.addEntity(user);
