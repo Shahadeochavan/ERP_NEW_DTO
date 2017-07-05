@@ -1,10 +1,10 @@
-package com.nextech.erp.factory;
+package com.nextech.erp.newDTO;
 import java.util.Date;
 
 import com.nextech.erp.model.Usertype;
 
 public class UserDTO {
-	private String userId;
+	private String userid;
 	private String password;
 	private String firstName;
 	private String lastName;
@@ -13,11 +13,13 @@ public class UserDTO {
 	private Date dob;
 	private Date doj;
 	private String email;
-	public String getUserId() {
-		return userId;
+
+
+	public String getUserid() {
+		return userid;
 	}
-	public void setUserId(String userId) {
-		this.userId = userId;
+	public void setUserid(String userid) {
+		this.userid = userid;
 	}
 	public String getPassword() {
 		return password;

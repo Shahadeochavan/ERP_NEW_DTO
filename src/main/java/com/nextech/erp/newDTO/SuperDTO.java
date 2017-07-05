@@ -1,4 +1,4 @@
-package com.nextech.erp.factory;
+package com.nextech.erp.newDTO;
 
 import java.sql.Timestamp;
 

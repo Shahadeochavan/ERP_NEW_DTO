@@ -1,6 +1,5 @@
 package com.nextech.erp.controller;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -29,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.nextech.erp.constants.ERPConstants;
 import com.nextech.erp.dto.Mail;
-import com.nextech.erp.factory.UserDTO;
+import com.nextech.erp.factory.UserFactory;
 import com.nextech.erp.filter.TokenFactory;
 import com.nextech.erp.model.Authorization;
 import com.nextech.erp.model.Notification;
@@ -40,7 +39,7 @@ import com.nextech.erp.model.Reportusertypeassociation;
 import com.nextech.erp.model.User;
 import com.nextech.erp.model.Usertype;
 import com.nextech.erp.model.Usertypepageassociation;
-import com.nextech.erp.model.Vendor;
+import com.nextech.erp.newDTO.UserDTO;
 import com.nextech.erp.service.MailService;
 import com.nextech.erp.service.NotificationService;
 import com.nextech.erp.service.NotificationUserAssociationService;
@@ -93,7 +92,7 @@ public class UserController {
 						.getDefaultMessage());
 			}
 			if ((Boolean) request.getAttribute("auth_token")) {
-				if (userservice.getUserByUserId(userDTO.getUserId()) == null) {
+				if (userservice.getUserByUserId(userDTO.getUserid()) == null) {
 
 				} else {
 					return new UserStatus(2, messageSource.getMessage(
@@ -109,13 +108,9 @@ public class UserController {
 					return new UserStatus(2, messageSource.getMessage(
 							ERPConstants.CONTACT_NUMBER_EXIT, null, null));
 				}
-				User user = new User();
-				user.setIsactive(true);
-				user.setCreatedBy(Long.parseLong(request.getAttribute("current_user").toString()));
-				userservice.addEntity(user);
+				UserFactory.saveUser(userDTO, request, response);
 
-				//TODO sending the email for new user from admin
-             mailSending(user, request, response);
+           //  mailSending(user, request, response);
 				return new UserStatus(1, "User added Successfully !");
 			} else {
 				new UserStatus(0, "User is not authenticated.");
@@ -295,7 +290,7 @@ public class UserController {
 	}
 
 
-	private void mailSending(User user,HttpServletRequest request,HttpServletResponse response) throws NumberFormatException, Exception{
+	public void mailSending(User user,HttpServletRequest request,HttpServletResponse response) throws NumberFormatException, Exception{
 			  Mail mail = new Mail();
 
 			  Notification notification = notificationService.getEntityById(Notification.class,5);
@@ -351,5 +346,5 @@ public class UserController {
 		        model.put("signature", "www.NextechServices.in");
 		        mail.setModel(model);
 		        mailService.sendEmailWithoutPdF(mail, notification);
-}
+    }
 }
