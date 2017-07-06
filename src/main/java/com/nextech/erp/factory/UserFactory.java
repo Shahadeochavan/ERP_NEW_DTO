@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.nextech.erp.controller.UserController;
+import com.nextech.erp.dao.UserDao;
 import com.nextech.erp.dto.Mail;
 import com.nextech.erp.model.Notification;
 import com.nextech.erp.model.Notificationuserassociation;
@@ -37,8 +38,12 @@ public class UserFactory {
 	@Autowired
 	MailService mailService;
 	
+	@Autowired
+	static
+	UserDao userDao;
+	
 
-	public static void saveUser(UserDTO userDTO,HttpServletRequest request,HttpServletResponse response) throws Exception{
+	public static User saveUser(UserDTO userDTO) throws Exception{
 		User user = new User();
 		user.setUserid(userDTO.getUserid());
 		user.setPassword(userDTO.getPassword());
@@ -48,8 +53,10 @@ public class UserFactory {
 		user.setDoj(userDTO.getDoj());
 		user.setEmail(userDTO.getEmail());
 		user.setUsertype(userDTO.getUsertype());
+		userDao.add(user);
+		return user;
 	}
-	public void mailSending(User user,HttpServletRequest request,HttpServletResponse response) throws NumberFormatException, Exception{
+	public void mailSending(User user,HttpServletRequest request) throws NumberFormatException, Exception{
 		  Mail mail = new Mail();
 
 		  Notification notification = notificationService.getEntityById(Notification.class,5);

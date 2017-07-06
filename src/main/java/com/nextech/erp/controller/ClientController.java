@@ -28,6 +28,7 @@ import com.nextech.erp.model.Notification;
 import com.nextech.erp.model.Notificationuserassociation;
 import com.nextech.erp.model.User;
 import com.nextech.erp.model.Vendor;
+import com.nextech.erp.newDTO.ClientDTO;
 import com.nextech.erp.service.ClientService;
 import com.nextech.erp.service.MailService;
 import com.nextech.erp.service.NotificationService;
@@ -60,32 +61,29 @@ public class ClientController {
 
 	@RequestMapping(value = "/create", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, headers = "Accept=application/json")
 	public @ResponseBody UserStatus addClient(
-			@Valid @RequestBody Client client, BindingResult bindingResult,
+			@Valid @RequestBody ClientDTO clientDTO, BindingResult bindingResult,
 			HttpServletRequest request, HttpServletResponse response) {
 		try {
 			if (bindingResult.hasErrors()) {
 				return new UserStatus(0, bindingResult.getFieldError()
 						.getDefaultMessage());
 			}
-			if (clientService.getClientByCompanyName(client.getCompanyname()) == null) {
+			if (clientService.getClientByCompanyName(clientDTO.getCompanyname()) == null) {
 
 			} else {
 				return new UserStatus(2, messageSource.getMessage(
 						ERPConstants.COMPANY_NAME_EXIT, null, null));
 
 			}
-			if (clientService.getClientByEmail(client.getEmailid()) == null) {
+			if (clientService.getClientByEmail(clientDTO.getEmailid()) == null) {
 			} else {
 				return new UserStatus(2, messageSource.getMessage(
 						ERPConstants.EMAIL_ALREADY_EXIT, null, null));
 			}
-			client.setCreatedBy(Long.parseLong(request.getAttribute(
-					"current_user").toString()));
-			client.setIsactive(true);
 
-			//TODO sending the email to the client
-			mailSending(client, request, response);
-			clientService.addEntity(client);
+		//	mailSending(client, request, response);
+			//clientService.addEntity(client);
+			clientService.saveClient(clientDTO, request);
 			return new UserStatus(1, messageSource.getMessage(
 					ERPConstants.CLIENT_ADDED, null, null));
 		} catch (ConstraintViolationException cve) {
@@ -114,32 +112,33 @@ public class ClientController {
 	}
 
 	@RequestMapping(value = "/update", method = RequestMethod.PUT, headers = "Accept=application/json")
-	public @ResponseBody UserStatus updateClient(@RequestBody Client client,
+	public @ResponseBody UserStatus updateClient(@RequestBody ClientDTO clientDTO,
 			HttpServletRequest request, HttpServletResponse response) {
 		try {
 			
-			Client oldClientInfo = clientService.getEntityById(Client.class, client.getId());
+			Client oldClientInfo = clientService.getEntityById(Client.class, clientDTO.getId());
 			System.out.println(oldClientInfo);
-			if(client.getCompanyname().equals(oldClientInfo.getCompanyname())){  	
+			if(clientDTO.getCompanyname().equals(oldClientInfo.getCompanyname())){  	
 			} else { 
-				if (clientService.getClientByCompanyName(client.getCompanyname()) == null) {
+				if (clientService.getClientByCompanyName(clientDTO.getCompanyname()) == null) {
 			    }else{  
 				return new UserStatus(2, messageSource.getMessage(ERPConstants.COMPANY_NAME_EXIT, null, null));
 				}
 			 }
-            if(client.getEmailid().equals(oldClientInfo.getEmailid())){  			
+            if(clientDTO.getEmailid().equals(oldClientInfo.getEmailid())){  			
 			} else { 
-				if (clientService.getClientByEmail(client.getEmailid()) == null) {
+				if (clientService.getClientByEmail(clientDTO.getEmailid()) == null) {
 			    }else{  
 				return new UserStatus(2, messageSource.getMessage(ERPConstants.EMAIL_ALREADY_EXIT, null, null));
 				}
 			 }
-			client.setUpdatedBy(Long.parseLong(request.getAttribute(
+		/*	client.setUpdatedBy(Long.parseLong(request.getAttribute(
 					"current_user").toString()));
-			client.setIsactive(true);
+			client.setIsactive(true);*/
 			
-			clientService.updateEntity(client);
-			mailSendingUpdate(client, request, response);
+			//clientService.updateEntity(client);
+			//mailSendingUpdate(client, request, response);
+            clientService.updateClient(clientDTO, request);
 			return new UserStatus(1, messageSource.getMessage(
 					ERPConstants.CLIENT_UPDATE, null, null));
 		} catch (Exception e) {

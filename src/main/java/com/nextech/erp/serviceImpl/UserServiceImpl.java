@@ -2,19 +2,29 @@ package com.nextech.erp.serviceImpl;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 
+import com.nextech.erp.constants.ERPConstants;
 import com.nextech.erp.dao.UserDao;
+import com.nextech.erp.factory.UserFactory;
 import com.nextech.erp.model.User;
+import com.nextech.erp.newDTO.UserDTO;
 import com.nextech.erp.service.UserService;
+import com.nextech.erp.status.UserStatus;
 @Service
 @Qualifier("userServiceImpl")
 public class UserServiceImpl extends CRUDServiceImpl<User> implements UserService {
 	
 	@Autowired
 	UserDao userdao;
+	
+	@Autowired
+	private MessageSource messageSource;
 
 	@Override
 	public User findByUserId(String string) throws Exception {
@@ -64,6 +74,25 @@ public class UserServiceImpl extends CRUDServiceImpl<User> implements UserServic
 	public User getUserByContact(String contact) throws Exception {
 		// TODO Auto-generated method stub
 		return userdao.getUserByContact(contact);
+	}
+
+	@Override
+	public User saveUser(UserDTO userDTO,HttpServletRequest request) throws Exception {
+		// TODO Auto-generated method stub
+		User user = new User();
+		user.setUserid(userDTO.getUserid());
+		user.setPassword(userDTO.getPassword());
+		user.setFirstName(userDTO.getFirstName());
+		user.setLastName(userDTO.getLastName());
+		user.setDob(userDTO.getDob());
+		user.setDoj(userDTO.getDoj());
+		user.setEmail(userDTO.getEmail());
+		user.setUsertype(userDTO.getUsertype());
+		user.setIsactive(true);
+		userdao.add(user);
+		UserFactory userFactory = new UserFactory();
+		userFactory.mailSending(user, request);
+		return user;
 	}
 	
 }

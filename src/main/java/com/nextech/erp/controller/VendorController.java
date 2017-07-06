@@ -28,6 +28,7 @@ import com.nextech.erp.model.Notification;
 import com.nextech.erp.model.Notificationuserassociation;
 import com.nextech.erp.model.User;
 import com.nextech.erp.model.Vendor;
+import com.nextech.erp.newDTO.VendorDTO;
 import com.nextech.erp.service.MailService;
 import com.nextech.erp.service.NotificationService;
 import com.nextech.erp.service.NotificationUserAssociationService;
@@ -60,27 +61,28 @@ public class VendorController {
 
 	@RequestMapping(value = "/create", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, headers = "Accept=application/json")
 	public @ResponseBody UserStatus addVendor(Model model,
-			@Valid @RequestBody Vendor vendor, BindingResult bindingResult,HttpServletRequest request,HttpServletResponse response) {
+			@Valid @RequestBody VendorDTO  vendorDTO, BindingResult bindingResult,HttpServletRequest request,HttpServletResponse response) {
 		try {
 			if (bindingResult.hasErrors()) {
-				model.addAttribute("vendor", vendor);
+				model.addAttribute("vendor", vendorDTO);
 				return new UserStatus(0, bindingResult.getFieldError()
 						.getDefaultMessage());
 			}
 
-			if (vendorService.getVendorByCompanyName(vendor.getCompanyName()) == null) {
+			if (vendorService.getVendorByCompanyName(vendorDTO.getCompanyName()) == null) {
 
 			} else {
 				return new UserStatus(2, messageSource.getMessage(ERPConstants.COMPANY_NAME_EXIT, null, null));
 			}
-			if (vendorService.getVendorByEmail(vendor.getEmail()) == null) {
+			if (vendorService.getVendorByEmail(vendorDTO.getEmail()) == null) {
 			} else {
 				return new UserStatus(2,messageSource.getMessage(ERPConstants.EMAIL_ALREADY_EXIT, null, null));
 			}
-			vendor.setCreatedBy(Long.parseLong(request.getAttribute("current_user").toString()));
+			/*vendor.setCreatedBy(Long.parseLong(request.getAttribute("current_user").toString()));
 			vendor.setIsactive(true);
-			vendorService.addEntity(vendor);
-			mailSending(vendor, request, response);
+			vendorService.addEntity(vendor);*/
+			vendorService.saveVendor(vendorDTO, request);
+		//	mailSending(vendor, request, response);
 			return new UserStatus(1, "vendor added Successfully !");
 		} catch (ConstraintViolationException cve) {
 			cve.printStackTrace();
@@ -106,28 +108,29 @@ public class VendorController {
 	}
 
 	@RequestMapping(value = "/update", method = RequestMethod.PUT, headers = "Accept=application/json")
-	public @ResponseBody UserStatus updateVendor(@RequestBody Vendor vendor,HttpServletRequest request,HttpServletResponse response) {
+	public @ResponseBody UserStatus updateVendor(@RequestBody VendorDTO vendorDTO,HttpServletRequest request,HttpServletResponse response) {
 		try {
-			Vendor oldVendorInfo = vendorService.getEntityById(Vendor.class, vendor.getId());
+			Vendor oldVendorInfo = vendorService.getEntityById(Vendor.class, vendorDTO.getId());
 			System.out.println(oldVendorInfo);
-			if(vendor.getCompanyName().equals(oldVendorInfo.getCompanyName())){  	
+			if(vendorDTO.getCompanyName().equals(oldVendorInfo.getCompanyName())){  	
 			} else { 
-				if (vendorService.getVendorByCompanyName(vendor.getCompanyName()) == null) {
+				if (vendorService.getVendorByCompanyName(vendorDTO.getCompanyName()) == null) {
 			    }else{  
 				return new UserStatus(2, messageSource.getMessage(ERPConstants.COMPANY_NAME_EXIT, null, null));
 				}
 			 }
-            if(vendor.getEmail().equals(oldVendorInfo.getEmail())){  	
+            if(vendorDTO.getEmail().equals(oldVendorInfo.getEmail())){  	
 			} else { 
-				if (vendorService.getVendorByEmail(vendor.getEmail()) == null) {
+				if (vendorService.getVendorByEmail(vendorDTO.getEmail()) == null) {
 			    }else{  
 				return new UserStatus(2, messageSource.getMessage(ERPConstants.EMAIL_ALREADY_EXIT, null, null));
 				}
 			 }
-			vendor.setUpdatedBy(Long.parseLong(request.getAttribute("current_user").toString()));
-			vendor.setIsactive(true);
-			vendorService.updateEntity(vendor);
-			mailSendingUpdate(vendor, request, response);
+//			vendor.setUpdatedBy(Long.parseLong(request.getAttribute("current_user").toString()));
+//			vendor.setIsactive(true);
+//			vendorService.updateEntity(vendor);
+            vendorService.updateVendor(vendorDTO, request);
+		//	mailSendingUpdate(vendor, request, response);
 			return new UserStatus(1, "Vendor update Successfully !");
 		} catch (Exception e) {
 			e.printStackTrace();

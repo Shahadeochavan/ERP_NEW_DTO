@@ -18,7 +18,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.nextech.erp.dao.UnitDao;
 import com.nextech.erp.model.Unit;
+import com.nextech.erp.newDTO.UnitDTO;
 import com.nextech.erp.service.UnitService;
 import com.nextech.erp.status.UserStatus;
 
@@ -30,17 +32,17 @@ public class UnitController {
 	UnitService unitservice;
 
 	@RequestMapping(value = "/create", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, headers = "Accept=application/json")
-	public @ResponseBody UserStatus addUnit(@Valid @RequestBody Unit unit,HttpServletRequest request,HttpServletResponse response,
+	public @ResponseBody UserStatus addUnit(@Valid @RequestBody UnitDTO unitDTO,HttpServletRequest request,HttpServletResponse response,
 			BindingResult bindingResult) {
 		try {
 			if (bindingResult.hasErrors()) {
 				return new UserStatus(0, bindingResult.getFieldError()
 						.getDefaultMessage());
 			}
-			unit.setCreatedBy(Long.parseLong(request.getAttribute("current_user").toString()));
-			unit.setIsactive(true);
-		long id=	unitservice.addEntity(unit);
-			System.out.println("id is"+id);
+		/*	unit.setCreatedBy(Long.parseLong(request.getAttribute("current_user").toString()));
+			 unit.setIsactive(true);
+		     unitservice.addEntity(unit);*/
+			unitservice.saveUnit(unitDTO, request);
 			return new UserStatus(1, "Unit added Successfully !");
 		} catch (ConstraintViolationException cve) {
 			cve.printStackTrace();
@@ -68,11 +70,12 @@ public class UnitController {
 	}
 
 	@RequestMapping(value = "/update", method = RequestMethod.PUT, headers = "Accept=application/json")
-	public @ResponseBody UserStatus updateUnit(@RequestBody Unit unit,HttpServletRequest request,HttpServletResponse response) {
+	public @ResponseBody UserStatus updateUnit(@RequestBody UnitDTO unitDTO,HttpServletRequest request,HttpServletResponse response) {
 		try {
-			unit.setUpdatedBy(Long.parseLong(request.getAttribute("current_user").toString()));
-			unit.setIsactive(true);
-			unitservice.updateEntity(unit);
+//			unit.setUpdatedBy(Long.parseLong(request.getAttribute("current_user").toString()));
+//			unit.setIsactive(true);
+//			unitservice.updateEntity(unit);
+			unitservice.updateUnit(unitDTO, request);
 			return new UserStatus(1, "Unit update Successfully !");
 		} catch (Exception e) {
 			 e.printStackTrace();

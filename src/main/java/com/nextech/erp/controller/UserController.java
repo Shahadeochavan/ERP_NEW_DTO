@@ -108,8 +108,8 @@ public class UserController {
 					return new UserStatus(2, messageSource.getMessage(
 							ERPConstants.CONTACT_NUMBER_EXIT, null, null));
 				}
-				UserFactory.saveUser(userDTO, request, response);
-
+				//UserFactory.saveUser(userDTO);
+				userservice.saveUser(userDTO,request);
            //  mailSending(user, request, response);
 				return new UserStatus(1, "User added Successfully !");
 			} else {
