@@ -30,5 +30,7 @@ public interface UserService extends CRUDService<User>{
 	
 	public User saveUser(UserDTO userDTO,HttpServletRequest request) throws Exception;
 	
+	public User updateUser(UserDTO userDTO,HttpServletRequest request) throws Exception;
+	
 	
 }

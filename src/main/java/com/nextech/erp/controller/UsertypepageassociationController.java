@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.nextech.erp.model.Usertypepageassociation;
+import com.nextech.erp.newDTO.UserTypePageAssoDTO;
 import com.nextech.erp.service.UsertypepageassociationService;
 import com.nextech.erp.status.UserStatus;
 
@@ -35,16 +36,14 @@ public class UsertypepageassociationController {
 
 	@RequestMapping(value = "/create", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, headers = "Accept=application/json")
 	public @ResponseBody UserStatus addPageAss(
-			@Valid @RequestBody Usertypepageassociation usertypepageassociation,
+			@Valid @RequestBody UserTypePageAssoDTO userTypePageAssoDTO,
 			BindingResult bindingResult,HttpServletRequest request,HttpServletResponse response) {
 		try {
 			if (bindingResult.hasErrors()) {
 				return new UserStatus(0, bindingResult.getFieldError()
 						.getDefaultMessage());
 			}
-			usertypepageassociation.setIsactive(true);
-			usertypepageassociation.setCreatedBy(Long.parseLong(request.getAttribute("current_user").toString()));
-			usertypepageassociationService.addEntity(usertypepageassociation);
+			usertypepageassociationService.saveUserTypePageAsso(userTypePageAssoDTO, request);
 			return new UserStatus(1,
 					"Usertypepageassociation added Successfully !");
 		} catch (ConstraintViolationException cve) {
@@ -74,12 +73,9 @@ public class UsertypepageassociationController {
 
 	@RequestMapping(value = "/update", method = RequestMethod.PUT, headers = "Accept=application/json")
 	public @ResponseBody UserStatus updatePageAss(
-			@RequestBody Usertypepageassociation usertypepageassociation,HttpServletRequest request,HttpServletResponse response) {
+			@RequestBody UserTypePageAssoDTO userTypePageAssoDTO,HttpServletRequest request,HttpServletResponse response) {
 		try {
-			usertypepageassociation.setIsactive(true);
-			usertypepageassociation.setUpdatedBy(Long.parseLong(request.getAttribute("current_user").toString()));
-			usertypepageassociationService
-					.updateEntity(usertypepageassociation);
+			usertypepageassociationService.updateUserTypePageAsso(userTypePageAssoDTO, request);
 			return new UserStatus(1,
 					"Usertypepageassociation update Successfully !");
 		} catch (Exception e) {

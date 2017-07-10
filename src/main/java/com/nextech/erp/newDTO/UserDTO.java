@@ -4,6 +4,8 @@ import java.util.Date;
 import com.nextech.erp.model.Usertype;
 
 public class UserDTO {
+	
+	private long id;
 	private String userid;
 	private String password;
 	private String firstName;
@@ -15,6 +17,12 @@ public class UserDTO {
 	private String email;
 
 
+	public long getId() {
+		return id;
+	}
+	public void setId(long id) {
+		this.id = id;
+	}
 	public String getUserid() {
 		return userid;
 	}
