@@ -14,7 +14,6 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.ui.velocity.VelocityEngineFactory;
 
-import com.nextech.erp.constants.ERPConstants;
 import com.nextech.erp.constants.ERPEmailConstants;
 
 @Configuration

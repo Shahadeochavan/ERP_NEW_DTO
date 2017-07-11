@@ -6,7 +6,6 @@ import javax.persistence.PersistenceException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -17,8 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.nextech.erp.dao.UnitDao;
 import com.nextech.erp.model.Unit;
 import com.nextech.erp.newDTO.UnitDTO;
 import com.nextech.erp.service.UnitService;
@@ -39,9 +36,6 @@ public class UnitController {
 				return new UserStatus(0, bindingResult.getFieldError()
 						.getDefaultMessage());
 			}
-		/*	unit.setCreatedBy(Long.parseLong(request.getAttribute("current_user").toString()));
-			 unit.setIsactive(true);
-		     unitservice.addEntity(unit);*/
 			unitservice.saveUnit(unitDTO, request);
 			return new UserStatus(1, "Unit added Successfully !");
 		} catch (ConstraintViolationException cve) {

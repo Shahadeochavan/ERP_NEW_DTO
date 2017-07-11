@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.nextech.erp.dao.UnitDao;
+import com.nextech.erp.factory.UnitFactory;
 import com.nextech.erp.model.Unit;
 import com.nextech.erp.newDTO.UnitDTO;
 import com.nextech.erp.service.UnitService;
@@ -15,7 +16,7 @@ public class UnitServiceImpl extends CRUDServiceImpl<Unit> implements UnitServic
 	@Autowired
 	UnitDao unitDao;
 	@Override
-	public Unit saveUnit(UnitDTO unitDTO,HttpServletRequest request) throws Exception {
+	public void saveUnit(UnitDTO unitDTO,HttpServletRequest request) throws Exception {
 		// TODO Auto-generated method stub
 		Unit unit = new Unit();
 		unit.setDescription(unitDTO.getDescription());
@@ -23,10 +24,9 @@ public class UnitServiceImpl extends CRUDServiceImpl<Unit> implements UnitServic
 		unit.setIsactive(true);
 		unit.setCreatedBy(Long.parseLong(request.getAttribute("current_user").toString()));
 		unitDao.add(unit);
-		return unit;
 	}
 	@Override
-	public Unit updateUnit(UnitDTO unitDTO, HttpServletRequest request)
+	public void updateUnit(UnitDTO unitDTO, HttpServletRequest request)
 			throws Exception {
 		// TODO Auto-generated method stub
 		Unit unit = new Unit();
@@ -36,7 +36,6 @@ public class UnitServiceImpl extends CRUDServiceImpl<Unit> implements UnitServic
 		unit.setIsactive(true);
 		unit.setCreatedBy(Long.parseLong(request.getAttribute("current_user").toString()));
 		unitDao.update(unit);
-		return unit;
 	}
 
 }
