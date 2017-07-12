@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.nextech.erp.constants.ERPConstants;
 import com.nextech.erp.dto.Mail;
+import com.nextech.erp.factory.VendorFactory;
 import com.nextech.erp.model.Notification;
 import com.nextech.erp.model.Notificationuserassociation;
 import com.nextech.erp.model.User;
@@ -78,11 +79,10 @@ public class VendorController {
 			} else {
 				return new UserStatus(2,messageSource.getMessage(ERPConstants.EMAIL_ALREADY_EXIT, null, null));
 			}
-			/*vendor.setCreatedBy(Long.parseLong(request.getAttribute("current_user").toString()));
-			vendor.setIsactive(true);
-			vendorService.addEntity(vendor);*/
-			vendorService.saveVendor(vendorDTO, request);
-		//	mailSending(vendor, request, response);
+              Vendor  vendor = VendorFactory.getVendor(vendorDTO, request);
+              vendor.setCreatedBy(Long.parseLong(request.getAttribute("current_user").toString()));
+              vendorService.addEntity(vendor);
+		      mailSending(vendor, request, response);
 			return new UserStatus(1, "vendor added Successfully !");
 		} catch (ConstraintViolationException cve) {
 			cve.printStackTrace();
@@ -126,11 +126,10 @@ public class VendorController {
 				return new UserStatus(2, messageSource.getMessage(ERPConstants.EMAIL_ALREADY_EXIT, null, null));
 				}
 			 }
-//			vendor.setUpdatedBy(Long.parseLong(request.getAttribute("current_user").toString()));
-//			vendor.setIsactive(true);
-//			vendorService.updateEntity(vendor);
-            vendorService.updateVendor(vendorDTO, request);
-		//	mailSendingUpdate(vendor, request, response);
+            Vendor  vendor = VendorFactory.getVendor(vendorDTO, request);
+            vendor.setUpdatedBy(Long.parseLong(request.getAttribute("current_user").toString()));
+            vendorService.updateEntity(vendor);
+		   mailSendingUpdate(vendor, request, response);
 			return new UserStatus(1, "Vendor update Successfully !");
 		} catch (Exception e) {
 			e.printStackTrace();

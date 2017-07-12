@@ -8,6 +8,7 @@ import javax.persistence.PersistenceException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -19,8 +20,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 import com.nextech.erp.constants.ERPConstants;
 import com.nextech.erp.dto.Mail;
+import com.nextech.erp.factory.ClientFactory;
 import com.nextech.erp.model.Client;
 import com.nextech.erp.model.Notification;
 import com.nextech.erp.model.Notificationuserassociation;
@@ -77,10 +80,10 @@ public class ClientController {
 				return new UserStatus(2, messageSource.getMessage(
 						ERPConstants.EMAIL_ALREADY_EXIT, null, null));
 			}
-
-		//	mailSending(client, request, response);
-			//clientService.addEntity(client);
-			clientService.saveClient(clientDTO, request);
+           Client client = ClientFactory.getClient(clientDTO, request);
+           client.setCreatedBy(Long.parseLong(request.getAttribute("current_user").toString()));
+		    	clientService.addEntity(client);
+		        mailSending(client, request, response);
 			return new UserStatus(1, messageSource.getMessage(
 					ERPConstants.CLIENT_ADDED, null, null));
 		} catch (ConstraintViolationException cve) {
@@ -129,13 +132,10 @@ public class ClientController {
 				return new UserStatus(2, messageSource.getMessage(ERPConstants.EMAIL_ALREADY_EXIT, null, null));
 				}
 			 }
-		/*	client.setUpdatedBy(Long.parseLong(request.getAttribute(
-					"current_user").toString()));
-			client.setIsactive(true);*/
-			
-			//clientService.updateEntity(client);
-			//mailSendingUpdate(client, request, response);
-            clientService.updateClient(clientDTO, request);
+            Client client = ClientFactory.getClient(clientDTO, request);
+        	client.setUpdatedBy(Long.parseLong(request.getAttribute("current_user").toString()));
+	    	clientService.updateEntity(client);
+	        mailSendingUpdate(client, request, response);
 			return new UserStatus(1, messageSource.getMessage(
 					ERPConstants.CLIENT_UPDATE, null, null));
 		} catch (Exception e) {

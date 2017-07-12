@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.nextech.erp.factory.UserTypeFactory;
 import com.nextech.erp.model.Usertype;
 import com.nextech.erp.newDTO.UserTypeDTO;
 import com.nextech.erp.service.UserTypeService;
@@ -39,7 +40,9 @@ public class UserTypeController {
 				return new UserStatus(0, bindingResult.getFieldError()
 						.getDefaultMessage());
 			}
-			userTypeService.saveUserType(userTypeDTO,request);
+			Usertype usertype = UserTypeFactory.getUserType(userTypeDTO, request);
+			usertype.setCreatedBy(Long.parseLong(request.getAttribute("current_user").toString()));
+			userTypeService.addEntity(usertype);
 			return new UserStatus(1, "Usertype added Successfully !");
 		} catch (ConstraintViolationException cve) {
 			System.out.println("Inside ConstraintViolationException");
@@ -70,7 +73,9 @@ public class UserTypeController {
 	@RequestMapping(value = "/update", method = RequestMethod.PUT, headers = "Accept=application/json")
 	public @ResponseBody UserStatus updateUserType(@RequestBody UserTypeDTO userTypeDTO,HttpServletRequest request,HttpServletResponse response) {
 		try {
-			userTypeService.updateUserType(userTypeDTO, request);
+		Usertype usertype =	UserTypeFactory.getUserType(userTypeDTO, request);
+		usertype.setUpdatedBy(Long.parseLong(request.getAttribute("current_user").toString()));
+		userTypeService.updateEntity(usertype);
 			return new UserStatus(1, "UserType update Successfully !");
 		} catch (Exception e) {
 			 e.printStackTrace();

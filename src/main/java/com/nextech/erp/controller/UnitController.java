@@ -6,6 +6,7 @@ import javax.persistence.PersistenceException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -16,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.nextech.erp.factory.UnitFactory;
 import com.nextech.erp.model.Unit;
 import com.nextech.erp.newDTO.UnitDTO;
 import com.nextech.erp.service.UnitService;
@@ -36,7 +39,9 @@ public class UnitController {
 				return new UserStatus(0, bindingResult.getFieldError()
 						.getDefaultMessage());
 			}
-			unitservice.saveUnit(unitDTO, request);
+		  Unit unit =	UnitFactory.getUnit(unitDTO, request);
+		  unit.setCreatedBy(Long.parseLong(request.getAttribute("current_user").toString()));
+			unitservice.addEntity(unit);
 			return new UserStatus(1, "Unit added Successfully !");
 		} catch (ConstraintViolationException cve) {
 			cve.printStackTrace();
@@ -66,10 +71,9 @@ public class UnitController {
 	@RequestMapping(value = "/update", method = RequestMethod.PUT, headers = "Accept=application/json")
 	public @ResponseBody UserStatus updateUnit(@RequestBody UnitDTO unitDTO,HttpServletRequest request,HttpServletResponse response) {
 		try {
-//			unit.setUpdatedBy(Long.parseLong(request.getAttribute("current_user").toString()));
-//			unit.setIsactive(true);
-//			unitservice.updateEntity(unit);
-			unitservice.updateUnit(unitDTO, request);
+			Unit unit = UnitFactory.getUnit(unitDTO, request);
+			unit.setUpdatedBy(Long.parseLong(request.getAttribute("current_user").toString()));
+			unitservice.updateEntity(unit);
 			return new UserStatus(1, "Unit update Successfully !");
 		} catch (Exception e) {
 			 e.printStackTrace();

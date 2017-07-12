@@ -64,6 +64,8 @@ public class ERPConstants {
 
    public static String STORE_OUT_PARTIAL="STORE_OUT_PARTIAL";
    public static String STORE_OUT_COMPLETE="STORE_OUT_COMPLETE";
+   public static String USER_ADD_NOTIFICATION="useraddNotification";
+   public static String USER_UPDATE_NOTIFICATION="userupdateNotifiaction";
 
 
 }

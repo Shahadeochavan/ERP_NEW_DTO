@@ -2,11 +2,7 @@ package com.nextech.erp.service;
 
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-
 import com.nextech.erp.model.User;
-import com.nextech.erp.newDTO.UserDTO;
-import com.nextech.erp.status.UserStatus;
 
 public interface UserService extends CRUDService<User>{
 
@@ -27,10 +23,6 @@ public interface UserService extends CRUDService<User>{
 	public User getEmailUserById(long id) throws Exception;
 	
 	public User getUserByContact(String contact) throws Exception;
-	
-	public User saveUser(UserDTO userDTO,HttpServletRequest request) throws Exception;
-	
-	public User updateUser(UserDTO userDTO,HttpServletRequest request) throws Exception;
 	
 	
 }

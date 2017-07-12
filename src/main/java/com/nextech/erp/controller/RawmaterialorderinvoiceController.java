@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.nextech.erp.constants.ERPConstants;
 import com.nextech.erp.dto.Mail;
 import com.nextech.erp.exceptions.RMOrderInvoiceExistsException;
+import com.nextech.erp.factory.RMOrdeInvoiceFactory;
 import com.nextech.erp.dto.RMOrderModelData;
 import com.nextech.erp.model.Notification;
 import com.nextech.erp.model.Notificationuserassociation;
@@ -39,6 +40,7 @@ import com.nextech.erp.model.Rmorderinvoiceintakquantity;
 import com.nextech.erp.model.Status;
 import com.nextech.erp.model.User;
 import com.nextech.erp.model.Vendor;
+import com.nextech.erp.newDTO.RMOrderInvoiceDTO;
 import com.nextech.erp.service.MailService;
 import com.nextech.erp.service.NotificationService;
 import com.nextech.erp.service.NotificationUserAssociationService;
@@ -106,7 +108,7 @@ public class RawmaterialorderinvoiceController {
 
 	@RequestMapping(value = "/securitycheck", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, headers = "Accept=application/json")
 	public @ResponseBody UserStatus addRawmaterialorderinvoice(
-			@Valid @RequestBody Rawmaterialorderinvoice rawmaterialorderinvoice,
+			@Valid @RequestBody RMOrderInvoiceDTO rmOrderInvoiceDTO,
 			BindingResult bindingResult,HttpServletRequest request,HttpServletResponse response) {
 		try {
 			if (bindingResult.hasErrors()) {
@@ -114,6 +116,7 @@ public class RawmaterialorderinvoiceController {
 						.getDefaultMessage());
 			}
 			//TODO save raw material invoice
+			Rawmaterialorderinvoice rawmaterialorderinvoice = RMOrdeInvoiceFactory.getRMorderInvoice(rmOrderInvoiceDTO);
 			    saveRMOrderInvoice(rawmaterialorderinvoice, request, response);
 				Rawmaterialorder rawmaterialorder = rawmaterialorderService.getEntityById(Rawmaterialorder.class,rawmaterialorderinvoice.getPo_No());
 
@@ -301,31 +304,6 @@ public class RawmaterialorderinvoiceController {
 		rawmaterialorder.setIsactive(true);
 		rawmaterialorderService.updateEntity(rawmaterialorder);
 	}
-
-/*	private void mailSending(Notification notification,Vendor vendor) throws Exception{
-		  Mail mail = new Mail();
-		  List<Notificationuserassociation> notificationuserassociations = notificationUserAssociationService.getNotificationuserassociationBynotificationId(notification.getId());
-		  for (Notificationuserassociation notificationuserassociation : notificationuserassociations) {
-			  User user = userService.getEntityById(User.class, notificationuserassociation.getUser().getId());
-			  if(notificationuserassociation.getTo()==true){
-				  mail.setMailTo(vendor.getEmail());
-			  }else if(notificationuserassociation.getBcc()==true){
-				  mail.setMailBcc(user.getEmail());
-			  }else if(notificationuserassociation.getCc()==true){
-				  mail.setMailCc(user.getEmail());
-			  }
-			
-		}
-	        mail.setMailSubject(notification.getSubject());
-	        Map < String, Object > model = new HashMap < String, Object > ();
-	        model.put("firstName", vendor.getFirstName());
-	        model.put("lastName", vendor.getLastName());
-	        model.put("location", "Pune");
-	        model.put("signature", "www.NextechServices.in");
-	        mail.setModel(model);
-
-		mailService.sendEmailWithoutPdF(mail,notification);
-	}*/
 	
 	private void mailSending(Notification notification,Rawmaterialorder rawmaterialorder,Vendor vendor) throws Exception{
 		List<Notificationuserassociation> notificationuserassociations = notificationUserAssociationService.getNotificationuserassociationBynotificationId(notification.getId());

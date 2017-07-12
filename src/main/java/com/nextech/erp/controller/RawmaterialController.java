@@ -20,11 +20,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.nextech.erp.constants.ERPConstants;
+import com.nextech.erp.factory.RMFactory;
 import com.nextech.erp.model.Product;
 import com.nextech.erp.model.Productinventory;
 import com.nextech.erp.model.Rawmaterial;
 import com.nextech.erp.model.Rawmaterialinventory;
 import com.nextech.erp.model.Rawmaterialvendorassociation;
+import com.nextech.erp.newDTO.RawMaterialDTO;
 import com.nextech.erp.service.RawmaterialService;
 import com.nextech.erp.service.RawmaterialinventoryService;
 import com.nextech.erp.status.UserStatus;
@@ -43,13 +45,13 @@ public class RawmaterialController {
 
 	@RequestMapping(value = "/create", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, headers = "Accept=application/json")
 	public @ResponseBody UserStatus addRawmaterial(
-			@Valid @RequestBody Rawmaterial rawmaterial, BindingResult bindingResult,HttpServletRequest request,HttpServletResponse response) {
+			@Valid @RequestBody RawMaterialDTO rawMaterialDTO, BindingResult bindingResult,HttpServletRequest request,HttpServletResponse response) {
 		try {
 			if (bindingResult.hasErrors()) {
 				return new UserStatus(0, bindingResult.getFieldError()
 						.getDefaultMessage());
 			}
-			rawmaterial.setIsactive(true);
+			Rawmaterial rawmaterial = RMFactory.getRawMaterial(rawMaterialDTO);
 			rawmaterial.setCreatedBy(Long.parseLong(request.getAttribute("current_user").toString()));
 			rawmaterialService.addEntity(rawmaterial);
 			addRMInventory(rawmaterial, Long.parseLong(request.getAttribute("current_user").toString()));
@@ -78,9 +80,9 @@ public class RawmaterialController {
 	}
 
 	@RequestMapping(value = "/update", method = RequestMethod.PUT, headers = "Accept=application/json")
-	public @ResponseBody UserStatus updateRawmaterial(@RequestBody Rawmaterial rawmaterial,HttpServletRequest request,HttpServletResponse response) {
+	public @ResponseBody UserStatus updateRawmaterial(@RequestBody RawMaterialDTO rawMaterialDTO,HttpServletRequest request,HttpServletResponse response) {
 		try {
-			rawmaterial.setIsactive(true);
+			Rawmaterial rawmaterial = RMFactory.getRawMaterial(rawMaterialDTO);
 			rawmaterial.setUpdatedBy(Long.parseLong(request.getAttribute("current_user").toString()));
 			rawmaterialService.updateEntity(rawmaterial);
 			return new UserStatus(1,messageSource.getMessage(ERPConstants.RAW_MATERAIL_UPDATE, null, null));

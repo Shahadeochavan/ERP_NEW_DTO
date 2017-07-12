@@ -4,12 +4,15 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import javax.naming.AuthenticationException;
 import javax.persistence.PersistenceException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.http.MediaType;
@@ -22,9 +25,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+
 import com.nextech.erp.constants.ERPConstants;
+import com.nextech.erp.dto.Mail;
+import com.nextech.erp.factory.UserFactory;
 import com.nextech.erp.filter.TokenFactory;
 import com.nextech.erp.model.Authorization;
+import com.nextech.erp.model.Notification;
+import com.nextech.erp.model.Notificationuserassociation;
 import com.nextech.erp.model.Page;
 import com.nextech.erp.model.Report;
 import com.nextech.erp.model.Reportusertypeassociation;
@@ -100,8 +108,11 @@ public class UserController {
 					return new UserStatus(2, messageSource.getMessage(
 							ERPConstants.CONTACT_NUMBER_EXIT, null, null));
 				}
-				userservice.saveUser(userDTO,request);
-				return new UserStatus(1, "User added Successfully !");
+			User user =	UserFactory.getUser(userDTO,request);
+			user.setCreatedBy(Long.parseLong(request.getAttribute("current_user").toString()));
+			userservice.addEntity(user);
+			mailSending(user, request, response);
+			return new UserStatus(1, "User added Successfully !");
 			} else {
 				new UserStatus(0, "User is not authenticated.");
 			}
@@ -223,8 +234,11 @@ public class UserController {
 							ERPConstants.CONTACT_NUMBER_EXIT, null, null));
 				}
 			}
-			userservice.updateUser(userDTO, request);
-			return new UserStatus(1, "User update Successfully !");
+		User user =	UserFactory.getUser(userDTO, request);
+		user.setUpdatedBy(Long.parseLong(request.getAttribute("current_user").toString()));
+		userservice.updateEntity(user);
+		mailSendingUpdate(user, request);
+		return new UserStatus(1, "User update Successfully !");
 		} catch (Exception e) {
 			e.printStackTrace();
 			return new UserStatus(0, e.toString());
@@ -275,5 +289,62 @@ public class UserController {
 		}
 
 	}
+	private void mailSending(User user,HttpServletRequest request,HttpServletResponse response) throws NumberFormatException, Exception{
+		  Mail mail = new Mail();
+
+		  Notification notification = notificationService.getEntityById(Notification.class,Long.parseLong(messageSource.getMessage(ERPConstants.USER_ADD_NOTIFICATION, null, null)));
+		  List<Notificationuserassociation> notificationuserassociations = notificationUserAssService.getNotificationuserassociationBynotificationId(notification.getId());
+		  for (Notificationuserassociation notificationuserassociation : notificationuserassociations) {
+			  User user1 = userservice.getEmailUserById(notificationuserassociation.getUser().getId());
+			  if(notificationuserassociation.getTo()==true){
+				  mail.setMailTo(user.getEmail());
+			  }else if(notificationuserassociation.getBcc()==true){
+				  mail.setMailBcc(user1.getEmail());
+			  }else if(notificationuserassociation.getCc()==true){
+				  mail.setMailCc(user1.getEmail());
+			  }
+			
+		}
+		        mail.setMailSubject(notification.getSubject());
+		        Map < String, Object > model = new HashMap < String, Object > ();
+		        model.put("firstName", user.getFirstName());
+		        model.put("lastName", user.getLastName());
+		        model.put("userId", user.getUserid());
+		        model.put("password", user.getPassword());
+		        model.put("email", user.getEmail());
+		        model.put("location", "Pune");
+		        model.put("signature", "www.NextechServices.in");
+		        mail.setModel(model);
+		        mailService.sendEmailWithoutPdF(mail, notification);
+}
+	
+	private void mailSendingUpdate(User user,HttpServletRequest request) throws NumberFormatException, Exception{
+		  Mail mail = new Mail();
+
+		  Notification notification = notificationService.getEntityById(Notification.class,16);
+		  List<Notificationuserassociation> notificationuserassociations = notificationUserAssService.getNotificationuserassociationBynotificationId(notification.getId());
+		  for (Notificationuserassociation notificationuserassociation : notificationuserassociations) {
+			  User user1 = userservice.getEmailUserById(notificationuserassociation.getUser().getId());
+			  if(notificationuserassociation.getTo()==true){
+				  mail.setMailTo(user.getEmail());
+			  }else if(notificationuserassociation.getBcc()==true){
+				  mail.setMailBcc(user1.getEmail());
+			  }else if(notificationuserassociation.getCc()==true){
+				  mail.setMailCc(user1.getEmail());
+			  }
+			
+		}
+		        mail.setMailSubject(notification.getSubject());
+		        Map < String, Object > model = new HashMap < String, Object > ();
+		        model.put("firstName", user.getFirstName());
+		        model.put("lastName", user.getLastName());
+		        model.put("userId", user.getUserid());
+		        model.put("password", user.getPassword());
+		        model.put("email", user.getEmail());
+		        model.put("location", "Pune");
+		        model.put("signature", "www.NextechServices.in");
+		        mail.setModel(model);
+		        mailService.sendEmailWithoutPdF(mail, notification);
+}
 
 }

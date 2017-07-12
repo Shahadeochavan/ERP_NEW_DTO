@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.nextech.erp.constants.ERPConstants;
 import com.nextech.erp.dto.ProductNewAssoicatedList;
+import com.nextech.erp.factory.ProductFactory;
 import com.nextech.erp.model.Product;
 import com.nextech.erp.model.Productinventory;
 import com.nextech.erp.model.Productrawmaterialassociation;
@@ -65,10 +66,10 @@ public class ProductController {
 			} else {
 				return new UserStatus(0, messageSource.getMessage(ERPConstants.PART_NUMBER, null, null));
 			}
-			//product.setIsactive(true);
-		//	product.setCreatedBy(Long.parseLong(request.getAttribute("current_user").toString()));
-			//productService.addEntity(product);
-		Product product =	productService.saveProduct(productDTO, request);
+			Product product = ProductFactory.getProduct(productDTO, request);
+		     	product.setCreatedBy(Long.parseLong(request.getAttribute("current_user").toString()));
+			    productService.addEntity(product);
+		        product =	productService.saveProduct(productDTO, request);
 		addProductInventory(product, Long.parseLong(request.getAttribute("current_user").toString()));
 			return new UserStatus(1, "product added Successfully !");
 		} catch (ConstraintViolationException cve) {
@@ -114,7 +115,9 @@ public class ProductController {
 				    	return new UserStatus(0, messageSource.getMessage(ERPConstants.PART_NUMBER, null, null));
 					}
 				 }
-			productService.updateProduct(productDTO, request);
+	            Product product =ProductFactory.getProduct(productDTO, request);
+	        	product.setUpdatedBy(Long.parseLong(request.getAttribute("current_user").toString()));
+				productService.updateEntity(product);
 			return new UserStatus(1, "Product update Successfully !");
 		} catch (Exception e) {
 			 e.printStackTrace();

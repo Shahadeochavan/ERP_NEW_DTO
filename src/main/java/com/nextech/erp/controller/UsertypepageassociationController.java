@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.nextech.erp.factory.UserTypePageAssoFactory;
 import com.nextech.erp.model.Usertypepageassociation;
 import com.nextech.erp.newDTO.UserTypePageAssoDTO;
 import com.nextech.erp.service.UsertypepageassociationService;
@@ -43,7 +44,9 @@ public class UsertypepageassociationController {
 				return new UserStatus(0, bindingResult.getFieldError()
 						.getDefaultMessage());
 			}
-			usertypepageassociationService.saveUserTypePageAsso(userTypePageAssoDTO, request);
+			Usertypepageassociation usertypepageassociation = UserTypePageAssoFactory.getUserTypePageAss(userTypePageAssoDTO, request);
+			usertypepageassociation.setCreatedBy(Long.parseLong(request.getAttribute("current_user").toString()));
+			usertypepageassociationService.addEntity(usertypepageassociation);
 			return new UserStatus(1,
 					"Usertypepageassociation added Successfully !");
 		} catch (ConstraintViolationException cve) {
@@ -75,7 +78,9 @@ public class UsertypepageassociationController {
 	public @ResponseBody UserStatus updatePageAss(
 			@RequestBody UserTypePageAssoDTO userTypePageAssoDTO,HttpServletRequest request,HttpServletResponse response) {
 		try {
-			usertypepageassociationService.updateUserTypePageAsso(userTypePageAssoDTO, request);
+			Usertypepageassociation usertypepageassociation = UserTypePageAssoFactory.getUserTypePageAss(userTypePageAssoDTO, request);
+			usertypepageassociation.setUpdatedBy(Long.parseLong(request.getAttribute("current_user").toString()));
+			usertypepageassociationService.addEntity(usertypepageassociation);
 			return new UserStatus(1,
 					"Usertypepageassociation update Successfully !");
 		} catch (Exception e) {
